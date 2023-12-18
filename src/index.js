@@ -1,7 +1,7 @@
 // require('dotenv').config({path: './env'}) - is not suatbale code but true code .
 import dotenv from "dotenv"
 import connectDB from "./database/index.js";
-
+import {app} from './app.js'
 
 
 dotenv.config({
