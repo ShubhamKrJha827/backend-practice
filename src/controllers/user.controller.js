@@ -177,7 +177,7 @@ const loginUser = asyncHandler(async(req, res)=>{
     const refereshAcessToken = asyncHandler(async(req,res)=>{
        const incomingRefereshToken = req.cookie.refereshToken || req.body.refereshToken
 
-       if (incomingRefereshToken) {
+       if (!incomingRefereshToken) {
        throw new ApiError(401, "unauthorized request")
         
        }
