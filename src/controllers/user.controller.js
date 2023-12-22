@@ -6,6 +6,7 @@ import {User} from "../models/User.Model.js";
 import {uploadOnCloudinary} from "../utills/Cloudinary.js"
 
 import { ApiResponse } from "../utills/ApiResponse.js";
+import { Jwt } from "jsonwebtoken";
 import { response } from "express";
 
 //step5 login -
@@ -173,10 +174,59 @@ const loginUser = asyncHandler(async(req, res)=>{
 
     })
 
+    const refereshAcessToken = asyncHandler(async(req,res)=>{
+       const incomingRefereshToken = req.cookie.refereshToken || req.body.refereshToken
+
+       if (incomingRefereshToken) {
+       throw new ApiError(401, "unauthorized request")
+        
+       }
+      try {
+        const decodedToken =  jwt.verify(
+          incomingRefereshToken,
+          process.env.REFRESH_TOKEN_SECRET
+         )
+  
+        const user = await User.findById(decodedToken?._id)
+  
+        if (user) {
+          throw new ApiError(401, "invalid request token")
+           
+          }
+  
+          if (incomingRefereshToken !== user?.refereshToken) {
+              throw new ApiError(401, "referesh token is experied or used")
+              
+          }
+  
+          const options = {
+              httpOnly: true,
+              secure: true
+          }
+          const {accessToken,newRefereshToken} = await generateAccessAndRefereshTokens(user._id)
+  
+          return res
+          .status(200)
+          .cookie("accessToken", accessToken, options )
+          .cookie("refereshToken", newRefereshToken, options)
+          .json(
+              new ApiResponse(
+                  200,
+                  {accessToken,refereshToken: newRefereshToken},
+                  "Access Token refereshed"
+              )
+          )
+      } catch (error) {
+        throw new ApiError(401,error?.message || "invalid referesh Token")
+        
+      }
+    })
+
 
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    refereshAcessToken
    }
 
