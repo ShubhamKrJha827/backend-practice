@@ -6,9 +6,9 @@ import {User} from "../models/User.Model.js";
 import {uploadOnCloudinary} from "../utills/Cloudinary.js"
 
 import { ApiResponse } from "../utills/ApiResponse.js";
-import { Jwt } from "jsonwebtoken";
+import { jwt } from "jsonwebtoken";
 import { response } from "express";
-
+import mongoose from "mongoose";
 //step5 login -
 const generateAccessAndRefereshTokens = async(userId) => {
     try {
